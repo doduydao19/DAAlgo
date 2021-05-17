@@ -12,26 +12,50 @@
 
 #định nghĩa contaier:
 class Container:
-    def __init__(self, id_input):
-        self.id_input
-
-        # ...
+    def __init__(self, id_input, id_output, size, weight, type):
+        self.id_input = id_input
+        self.id_output = id_output
+        self.size = size
+        self.weight = weight
+        self.type = type
 
 # tạo mảng 2 chiều cho khoang: row và tier
-def create_bay():
-    return []
+def create_bay(containers):
+    bay = []
+    counter = 1
+    tier = []
+    for container in containers:
+        if counter <= 10:
+            tier.append(container)
+        else:
+            tier_sorted = create_tier(tier)
+            bay.append(tier_sorted)
+            tier = []
+        counter += 1
+    return bay
 
 # 1 tier gồm row_trái và row_phải
 # w_r_trái = w_r_phải
-def create_tier():
-    return []
+def create_tier(containers):
+    row = []
+    counter = 1
+    for container in containers:
+        if counter <= 5:
+            row.append(container)
+        else:
+            row = []
+            row_soterted = create_row(row)
+
+        counter += 1
+    return row
 
 #tạo mảng 1 chiều
 def create_row():
     return []
 
-# sắp xếp để có những container phù hợp ở trong boong (10 lớp)
+# sắp xếp để có những container phù hợp ở trong boong (5 lớp)
 def sort_in_boong():
+
     return []
 
 # sắp xếp để có những container  phù hợp trên trong boong
@@ -49,16 +73,54 @@ def create_position_all_bays(data):
     # Ptu 2: số lượng các container
     # Ptu 3: tổng trọng lượng của các container
     # Ptu 4: mảng các container (ở dạng danh sách)
-    
+
+    bays = []
     for harbour in data:
         id_harbour = harbour[0]
         no_containers = harbour[1]
         weight_total = harbour[2]
-        container = harbour[3]
-        create_bay(container)
+        containers = harbour[3]
+        bays.append(id_harbour, no_containers, weight_total, create_bay(containers))
     
     return []
 
+def classify_container(containers):
+    # ở đây sẽ phân loại theo type of container.
+    # 7 loại thường gặp:
+    DC = []     # DC: dry container
+    BC = []     # BC: Bulk container
+    NCC = []    # NCC: Named Cargo Container
+    TC = []     # TC: Thermal Containers
+    OC = []     # OC: Open-top Container
+    TP = []     # TP: Platform Container
+    TAC = []    # TAC: Tank Container
+
+    for container in containers:
+        if container.type == "DC":
+            DC.append(container)
+        if container.type == "BC":
+            BC.append(container)
+        if container.type == "NCC":
+            NCC.append(container)
+        if container.type == "TC":
+            TC.append(container)
+        if container.type == "OC":
+            OC.append(container)
+        if container.type == "TP":
+            TP.append(container)
+        if container.type == "TAC":
+            TAC.append(container)
+
+    return [DC, BC, NCC, TC, OC, TP, TAC]
+
+def make_polarity(containers_in_harbour):
+    # phân loại container
+    containers_classified = classify_container(containers_in_harbour)
+    containers_polarity = []
+    for containers_type in containers_classified:
+        for container in containers_type:
+            containers_polarity.append(container)
+    return containers_polarity
 
 def input(f_data_harbour):
     data = []
@@ -79,7 +141,10 @@ def input(f_data_harbour):
                     container = Container(data_container[0], data_container[1], data_container[2], data_container[3], data_container[4])
                     total_weight += data_container[3]
                     containers_in_harbour.append(container)
-            data.append([id_harbour, no_container, total_weight, containers_in_harbour])
+
+            # tạo ra sự ưu tiên giữa các container
+            containers_polarity = make_polarity(containers_in_harbour)
+            data.append([id_harbour, no_container, total_weight, containers_polarity])
     return data
 
 def output():
