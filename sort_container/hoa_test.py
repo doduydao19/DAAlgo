@@ -9,38 +9,52 @@
 # 1 lớp: chứa 1 hàng.
 # khoang tàu gồm 2 phần: trong boong(đối đa 10 lớp) và trên boong(đủ hàng hoặc tổng trọng lượng hàng < N):
 
-
-#định nghĩa contaier:
+# định nghĩa contaier:
 class Container:
-    def __init__(self, id_input):
-        self.id_input
+    def __init__(self, id_input, id_output, size, weight, type):
+        self.id_input = id_input
+        self.id_output = id_output
+        self.size = size
+        self.weight = weight
+        self.type = type
 
-        # ...
 
 # tạo mảng 2 chiều cho khoang: row và tier
-def create_bay():
-    return []
+def create_bay(container):
+
+    
+    return bay
+
 
 # 1 tier gồm row_trái và row_phải
 # w_r_trái = w_r_phải
-def create_tier():
-    return []
+def create_tier(row_left, row_right, stdev):
+    tier = []
+    compare = abs(sum(row_left) - sum(row_right))
+    if compare <= stdev:
+        tier = row_left + row_right
+    return tier
 
-#tạo mảng 1 chiều
+
+# tạo mảng 1 chiều
 def create_row():
     return []
+
 
 # sắp xếp để có những container phù hợp ở trong boong (10 lớp)
 def sort_in_boong():
     return []
 
+
 # sắp xếp để có những container  phù hợp trên trong boong
 def sort_on_boong():
     return []
 
+
 # kiểm tra xem tổng trọng lượng hàng hóa đã đủ hay chưa?
 def isFull():
     return False
+
 
 # sinh ra vị trí của các bay cho phù hợp trên con tàu để tàu không lệch.
 def create_position_all_bays():
@@ -50,8 +64,10 @@ def create_position_all_bays():
 def input():
     return
 
+
 def output():
     return
+
 
 def main():
     # danh sách các container và hành trình
@@ -59,6 +75,7 @@ def main():
     p = create_position_all_bays(data)
     output(p)
     return
+
 
 if __name__ == '__main__':
     main()
