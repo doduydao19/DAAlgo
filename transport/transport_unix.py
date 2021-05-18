@@ -208,9 +208,7 @@ if __name__ == '__main__':
                     if line != line[0]:
                         o.write("\n")
                         
-    with open("output.txt", "r+") as file:
-        content = file.read()
-        file.write(content[:-1])
+    
 
 
 
