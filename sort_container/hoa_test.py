@@ -1,3 +1,4 @@
+import math
 # Bài toán xếp container
 # Đầu vào là: Mảng các container, hành trình cập bến tàu
 # Đầu ra là: Bảng vị trí các container.
@@ -8,6 +9,7 @@
 # 1 hàng: 1 mảng 1 chiều chứa các containter: kich thước mảng: 5(trái) vs 5(phải) từ tâm tàu sang 2 bên
 # 1 lớp: chứa 1 hàng.
 # khoang tàu gồm 2 phần: trong boong(đối đa 10 lớp) và trên boong(đủ hàng hoặc tổng trọng lượng hàng < N):
+
 
 # định nghĩa contaier:
 class Container:
@@ -20,28 +22,52 @@ class Container:
 
 
 # tạo mảng 2 chiều cho khoang: row và tier
-def create_bay(container):
-
-    
+def create_bay(containers):
+    bay = []
+    counter = 1
+    tier = []
+    for container in containers:
+        if counter <= 10:
+            tier.append(container)
+        else:
+            tier_sorted = create_tier(tier)
+            bay.append(tier_sorted)
+            tier = []
+        counter += 1
     return bay
 
 
 # 1 tier gồm row_trái và row_phải
 # w_r_trái = w_r_phải
-def create_tier(row_left, row_right, stdev):
-    tier = []
-    compare = abs(sum(row_left) - sum(row_right))
-    if compare <= stdev:
-        tier = row_left + row_right
-    return tier
+def create_tier(containers):
+    row = []
+    counter = 1
+    row_left, row_right = create_row(containers[0:5], containers[5:])
+    return row
 
 
-# tạo mảng 1 chiều
-def create_row():
-    return []
+# row gồm row_left, row_right
+def create_row(row_left, row_right):
+    row_left_sorted = []
+    row_right_sorted = []
+    # sắp xếp sao cho tổng trọng lượng 2 bên
+
+    min = math.inf
+
+    # while min < abs(sum(row_left) - sum(row_right)):
+    #     for i in range(len(row_left)):
+    #         for j in range(len(row_right)):y
 
 
-# sắp xếp để có những container phù hợp ở trong boong (10 lớp)
+
+    return row_left_sorted, row_right_sorted
+
+def swap(val1, val2):
+    temp = val1
+    val1 = val2
+    val2 = temp
+
+# sắp xếp để có những container phù hợp ở trong boong (5 lớp)
 def sort_in_boong():
     return []
 
@@ -57,12 +83,112 @@ def isFull():
 
 
 # sinh ra vị trí của các bay cho phù hợp trên con tàu để tàu không lệch.
-def create_position_all_bays():
-    return []
+def create_position_all_bays(data):
+    # đầu vào là data mảng n mảng con 1 mảng con gồm 3 phần tử:
+    # Ptu 1: id của cảng
+    # Ptu 2: số lượng các container
+    # Ptu 3: tổng trọng lượng của các container
+    # Ptu 4: mảng các container (ở dạng danh sách)
+
+    bays = []
+    for harbour in data:
+        id_harbour = harbour[0]
+        no_containers = harbour[1]
+        weight_total = harbour[2]
+        containers = harbour[3]
+        bays.append([id_harbour, no_containers, weight_total, create_bay(containers)])
+
+    return bays
+
+def sort_weight(containers):
+    for i in range(len(containers)):
+        for j in range(len(containers)):
+            if containers[j].weight > containers[i].weight:
+                temp = containers[i]
+                containers[i] = containers[j]
+                containers[j] = temp
+    return containers
+
+def classify_container(containers):
+    # ở đây sẽ phân loại theo type of container.
+    # 7 loại thường gặp:
+    DC = []  # DC: Dry container
+    BC = []  # BC: Bulk container
+    NCC = []  # NCC: Named Cargo Container
+    TC = []  # TC: Thermal Containers
+    OC = []  # OC: Open-top Container
+    TP = []  # TP: Platform Container
+    TAC = []  # TAC: Tank Container
+
+    for container in containers:
+        if container.type == "DC":
+            DC.append(container)
+        if container.type == "BC":
+            BC.append(container)
+        if container.type == "NCC":
+            NCC.append(container)
+        if container.type == "TC":
+            TC.append(container)
+        if container.type == "OC":
+            OC.append(container)
+        if container.type == "TP":
+            TP.append(container)
+        if container.type == "TAC":
+            TAC.append(container)
+
+    # sắp xếp container DC
+    sort_weight(DC)
+    # sắp xếp container BC
+    sort_weight(BC)
+    # sắp xếp container NCC
+    sort_weight(NCC)
+    # sắp xếp container TC
+    sort_weight(TC)
+    # sắp xếp container TP
+    sort_weight(TP)
+    # sắp xếp container TAC
+    sort_weight(TAC)
+
+    return [DC, BC, NCC, TC, OC, TP, TAC]
 
 
-def input():
-    return
+
+def make_priority(containers_in_harbour):
+    # phân loại container
+    containers_classified = classify_container(containers_in_harbour)
+    containers_polarity = []
+    for containers_type in containers_classified:
+        for container in containers_type:
+            containers_polarity.append(container)
+    return containers_polarity
+
+
+def input(f_data_harbour):
+    data = []
+    with open(f_data_harbour, "r", encoding="utf-8") as file:
+        nameFolder = f_data_harbour[:-4]
+        for line in file:
+            info = line.strip('\n').split("\t")
+            # tách lấy id cảng và số lượng container của cảng đó
+            id_harbour = info[0]
+            no_container = info[1]
+            # lấy thông tin của các container của cảng
+            f_harbour = nameFolder + "/" + str(id_harbour) + ".txt"
+            containers_in_harbour = []
+            total_weight = 0
+
+            with open(f_harbour, "r", encoding="utf-8") as file_harbour:
+                for row in file_harbour:
+                    data_container = str(row).strip('\n').split("\t")
+                    container = Container(data_container[0], data_container[1], data_container[2], data_container[3],
+                                          data_container[4])
+                    total_weight += int(data_container[3])
+                    containers_in_harbour.append(container)
+
+            # tạo ra sự ưu tiên giữa các container
+            containers_polarity = make_priority(containers_in_harbour)
+            data.append([id_harbour, no_container, total_weight, containers_polarity])
+    return data
 
 
 def output():
@@ -71,7 +197,8 @@ def output():
 
 def main():
     # danh sách các container và hành trình
-    data = input()
+    f_data_harbour = "data.txt"
+    data = input(f_data_harbour)
     p = create_position_all_bays(data)
     output(p)
     return
