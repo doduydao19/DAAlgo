@@ -1,2 +1,0 @@
-Time to get from A to F is: 6.33 minutes.
-A->C->F
