@@ -79,7 +79,8 @@ class Dijkstra:
         for i in reversed(route):
             print(i)
             f.write(i)
-            f.write("\n")
+            if i!= route[0]:
+                f.write("\n")
         f.close()
         # print(costs)
 
@@ -179,27 +180,33 @@ if __name__ == '__main__':
                 if "A" in line:
                     line = "A" + "  " + str(countA)
                     o.write(line)
-                    o.write("\n")
+                    if line != line[0]:
+                        o.write("\n")
                 if "B" in line:
                     line = "B" + "  " + str(countB)
                     o.write(line)
-                    o.write("\n")
+                    if line!= line[0]:
+                        o.write("\n")
                 if "C" in line:
                     line = "C" + "  " + str(countC)
                     o.write(line)
-                    o.write("\n")
+                    if line != line[0]:
+                        o.write("\n")
                 if "D" in line:
                     line = "D" + "  " + str(countD)
                     o.write(line)
-                    o.write("\n")
+                    if line!= line[0]:
+                        o.write("\n")
                 if "E" in line:
                     line = "E" + "  " + str(countE)
                     o.write(line)
-                    f.write("\n")
+                    if line!= line[0]:
+                        f.write("\n")
                 if "F" in line:
                     line = "F" + "  " + str(countF)
                     o.write(line)
-                    o.write("\n")
+                    if line != line[0]:
+                        o.write("\n")
 
 
 
