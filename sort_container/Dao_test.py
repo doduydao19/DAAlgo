@@ -37,16 +37,18 @@ def create_bay(containers):
 # 1 tier gồm row_trái và row_phải
 # w_r_trái = w_r_phải
 def create_tier(containers):
-    row = []
     counter = 1
     row_left, row_right = create_row(containers[0:5], containers[5:])
-    return row
+    return [row_left, row_right]
 
 # row gồm row_left, row_right
 def create_row(row_left, row_right):
     row_left_sorted = []
     row_right_sorted = []
     # sắp xếp sao cho tổng trọng lượng 2 bên
+
+    # thuật toán sắp xếp.
+
     return row_left_sorted, row_right_sorted
 
 # sắp xếp để có những container phù hợp ở trong boong (5 lớp)
@@ -106,7 +108,7 @@ def classify_container(containers):
             TP.append(container)
         if container.type == "TAC":
             TAC.append(container)
-
+    #sort
     return [DC, BC, NCC, TC, OC, TP, TAC]
 
 def make_priority(containers_in_harbour):
@@ -139,8 +141,8 @@ def input(f_data_harbour):
                     containers_in_harbour.append(container)
 
             # tạo ra sự ưu tiên giữa các container
-            containers_polarity = make_priority(containers_in_harbour)
-            data.append([id_harbour, no_container, total_weight, containers_polarity])
+            containers_priority= make_priority(containers_in_harbour)
+            data.append([id_harbour, no_container, total_weight, containers_priority])
     return data
 
 def output():
