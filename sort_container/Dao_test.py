@@ -103,6 +103,9 @@ def create_row(row_left, row_right):
                 index = i
         # print(matrix_balance)
         # print(index)
+
+
+
         swap_pair(row_left, row_right, index)
         # print("\nleft")
         # print_contain(row_left)
