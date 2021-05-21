@@ -186,27 +186,27 @@ if __name__ == '__main__':
 
             for line in content:
                 if "A" in line:
-                    line = "A" + "  " + str(countA)
+                    line = "A" + "\t" + str(countA)
                     o.write(line)
                     o.write("\n")
                 if "B" in line:
-                    line = "B" + "  " + str(countB)
+                    line = "B" + "\t" + str(countB)
                     o.write(line)
                     o.write("\n")
                 if "C" in line:
-                    line = "C" + "  " + str(countC)
+                    line = "C" + "\t" + str(countC)
                     o.write(line)
                     o.write("\n")
                 if "D" in line:
-                    line = "D" + "  " + str(countD)
+                    line = "D" + "\t" + str(countD)
                     o.write(line)
                     o.write("\n")
                 if "E" in line:
-                    line = "E" + "  " + str(countE)
+                    line = "E" + "\t" + str(countE)
                     o.write(line)
                     f.write("\n")
                 if "F" in line:
-                    line = "F" + "  " + str(countF)
+                    line = "F" + "\t" + str(countF)
                     o.write(line)
                     o.write("\n")
                     
