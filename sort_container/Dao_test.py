@@ -50,7 +50,6 @@ def isFull():
 def create_tier(containers):
     sort_weight([containers, []])
     # cắt thành 2 dãy
-
     row_left, row_right = create_row(containers[0:len(containers):2], containers[1:len(containers):2])
 
     return [row_left, row_right]
@@ -89,28 +88,27 @@ def create_row_BruteForce(row_left, row_right):
     # print(matrix_balance)
 
     # khởi tạo ma trận phương án:
-    while matrix_balance[0][0] != matrix_balance[1][0]:
-        for r in range(1, len(row_right)):
-            # tìm min sau 1 bước chuyển:
-            index = 0
-            for c in range(r, len(row_left)):
-                matrix_balance[r][c] = matrix_balance[r][c - 1] - 2 * (row_left[c].weight - row_right[c].weight)
-                if matrix_balance[0][r] > abs(matrix_balance[r][c]):
-                    matrix_balance[0][r] = abs(matrix_balance[r][c])
 
-        # tìm giá trị min và vị trí min
-        for i in range(1, len(matrix_balance[0])):
-            if matrix_balance[0][0] > matrix_balance[0][i]:
-                matrix_balance[0][0] = matrix_balance[0][i]
-                index = i
+    for r in range(1, len(row_right)):
+        # tìm min sau 1 bước chuyển:
+        for c in range(r, len(row_left)):
+            matrix_balance[r][c] = abs(matrix_balance[r][c - 1] - 2 * (row_left[c].weight - row_right[c].weight))
+            if matrix_balance[0][r] > abs(matrix_balance[r][c]):
+                matrix_balance[0][r] = abs(matrix_balance[r][c])
 
-        swap_pair(row_left, row_right, index)
+    # tìm giá trị min và các vị trí cần đổi chỗ:
+    index = 0
+    for i in range(1, len(matrix_balance[0])):
+        if matrix_balance[0][0] > matrix_balance[0][i]:
+            matrix_balance[0][0] = matrix_balance[0][i]
+            index = i
 
-        # cập nhật lại độ lệch
-        for r in range(1, len(row_right)):
-            matrix_balance[r][r - 1] = matrix_balance[index][index]
-
-    print(matrix_balance)
+    for i in range(index,len(matrix_balance[index])):
+        if abs(matrix_balance[index][i]) == matrix_balance[0][0]:
+            swap_pair(row_left, row_right, i)
+            break
+        else:
+            swap_pair(row_left, row_right, i)
 
     return row_left, row_right
 
@@ -155,8 +153,8 @@ def create_row(row_left, row_right):
         print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
     print("weight: ", calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
 
-    left, right = create_row_Greedy(row_left, row_right)
-
+    # left, right = create_row_Greedy(row_left, row_right)
+    left, right = create_row_BruteForce(row_left, row_right)
     print("Sau")
     print("left \t\t\t right")
     for i in range(len(row_left)):
