@@ -24,14 +24,14 @@ class Container:
         self.type = type
         self.stringCont = self.stringContainer()
 
-
     def stringContainer(self):
-        return str(self.id_input) + " " + str(self.id_output) + " " + str(self.size) + " " + str(self.weight) + " " + str(self.type)
+        return str(self.id_input) + " " + str(self.id_output) + " " + str(self.size) + " " + str(
+            self.weight) + " " + str(self.type)
 
 
 # sắp xếp để có những container  phù hợp trên trong boong
 def sort_bay(tiers):
-    #tier gồm r_trái và r_phải
+    # tier gồm r_trái và r_phải
     # w_l   w_r     bias
     # [8]   [6]     2
     # [11]  [5]     6
@@ -46,30 +46,23 @@ def isFull():
     return False
 
 
-def print_contain(DC):
-    if DC != None:
-        if len(DC) == 0:
-            print("None")
-        else:
-            for d in DC:
-                print(d.id_input, d.id_output, d.size, d.weight, d.type)
-
-
-#hàm tạo ra 1 lớp
+# hàm tạo ra 1 lớp
 def create_tier(containers):
     sort_weight([containers, []])
-    #cắt thành 2 dãy
+    # cắt thành 2 dãy
 
     row_left, row_right = create_row(containers[0:len(containers):2], containers[1:len(containers):2])
 
     return [row_left, row_right]
 
-#hàm tính tổng trọng lượng của cả hàng
+
+# hàm tính tổng trọng lượng của cả hàng
 def calculas_total_weight(row):
     sum = 0
     for cont in row:
         sum += cont.weight
     return sum
+
 
 # hàm đổi vị trí của 2 container
 def swap_pair(left, right, pair_swap):
@@ -80,7 +73,6 @@ def swap_pair(left, right, pair_swap):
 
 # row gồm row_left, row_right
 def create_row_BruteForce(row_left, row_right):
-
     # sắp xếp sao cho tổng trọng lượng 2 bên
     # tỉnh tổng trọng lượng 2 bên:
     w_left = calculas_total_weight(row_left)
@@ -114,7 +106,6 @@ def create_row_BruteForce(row_left, row_right):
 
         swap_pair(row_left, row_right, index)
 
-
         # cập nhật lại độ lệch
         for r in range(1, len(row_right)):
             matrix_balance[r][r - 1] = matrix_balance[index][index]
@@ -125,7 +116,7 @@ def create_row_BruteForce(row_left, row_right):
 
 
 def create_row_Greedy(row_left, row_right):
-
+    print("****sắp xếp bằng thuật toán tham lam:")
     w_left = calculas_total_weight(row_left)
     w_right = calculas_total_weight(row_right)
     bias_basic = w_left - w_right
@@ -134,41 +125,44 @@ def create_row_Greedy(row_left, row_right):
     bias_array = [bias_basic]
     for i in range(1, len(row_left)):
         bias_array.append(0)
+
+    # tính toán:
     index = 0
     bias_min = sys.maxsize
-    while bias_array[0] < bias_min:
+    while bias_array[0] != bias_min:
+        if bias_array[0] > bias_min:
+            bias_array[0] = bias_min
+            swap_pair(row_left, row_right, index)
 
         for i in range(1, len(row_left)):
-            bias = abs(row_left[i].weight - row_right[i].weight)
+            bias = abs(bias_array[0] - 2 *(row_left[i].weight - row_right[i].weight))
             bias_array[i] = bias
             if bias_min > bias:
                 bias_min = bias
                 index = i
-        if bias_array[0] > bias_min:
-            bias_array[0] = bias_min
-        swap_pair(row_left, row_right, index)
+
 
     return row_left, row_right
 
-#sắp xếp container theo hàng
-#input: 2 hàng con
-#output: 1 tier
+
+# sắp xếp container theo hàng
+# input: 2 hàng con
+# output: 1 tier
 def create_row(row_left, row_right):
     print("trước")
     print("left \t\t\t\t right")
     for i in range(len(row_left)):
-        print(row_left[i].stringCont  +"\t"+ row_right[i].stringCont)
-    print("weight: ",calculas_total_weight(row_left),"\t\t\t\t",calculas_total_weight(row_right))
-    # left, right = create_row_BruteForce(row_left, row_right)
+        print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
+    print("weight: ", calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
+
     left, right = create_row_Greedy(row_left, row_right)
+
     print("Sau")
     print("left \t\t\t right")
     for i in range(len(row_left)):
-        print(row_left[i].stringCont  +"\t"+ row_right[i].stringCont)
-    print(calculas_total_weight(row_left[i]), "\t\t\t\t", calculas_total_weight(row_right[i]))
+        print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
+    print(calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
     return left, right
-
-
 
 
 # tạo mảng 2 chiều cho khoang: row và tier
