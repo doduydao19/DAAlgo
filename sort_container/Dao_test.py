@@ -1,5 +1,7 @@
 import sys
 import math
+
+
 # Bài toán xếp container
 # Đầu vào là: Mảng các container, hành trình cập bến tàu
 # Đầu ra là: Bảng vị trí các container.
@@ -12,7 +14,7 @@ import math
 # khoang tàu gồm 2 phần: trong boong(đối đa 10 lớp) và trên boong(đủ hàng hoặc tổng trọng lượng hàng < N):
 
 
-#định nghĩa contaier:
+# định nghĩa contaier:
 class Container:
     def __init__(self, id_input, id_output, size, weight, type):
         self.id_input = id_input
@@ -20,55 +22,64 @@ class Container:
         self.size = size
         self.weight = weight
         self.type = type
+        self.stringCont = self.stringContainer()
 
 
-# sắp xếp để có những container phù hợp ở trong boong (5 lớp)
-def sort_in_boong():
+    def stringContainer(self):
+        return str(self.id_input) + " " + str(self.id_output) + " " + str(self.size) + " " + str(self.weight) + " " + str(self.type)
 
-    return []
 
 # sắp xếp để có những container  phù hợp trên trong boong
-def sort_on_boong():
+def sort_bay(tiers):
+    #tier gồm r_trái và r_phải
+    # w_l   w_r     bias
+    # [8]   [6]     2
+    # [11]  [5]     6
+    # [5]   [10]    5
+    # 22    23      1
+
     return []
+
 
 # kiểm tra xem tổng trọng lượng hàng hóa đã đủ hay chưa?
 def isFull():
     return False
+
+
 def print_contain(DC):
     if DC != None:
         if len(DC) == 0:
             print("None")
         else:
             for d in DC:
-                print(d.id_input ,d.id_output, d.size, d.weight, d.type)
-# 1 tier gồm row_trái và row_phải
-# w_r_trái = w_r_phải
+                print(d.id_input, d.id_output, d.size, d.weight, d.type)
+
+
+#hàm tạo ra 1 lớp
 def create_tier(containers):
-    sort_weight([containers,[]])
-    # print_contain(containers)
+    sort_weight([containers, []])
+    #cắt thành 2 dãy
+
     row_left, row_right = create_row(containers[0:len(containers):2], containers[1:len(containers):2])
+
     return [row_left, row_right]
 
+#hàm tính tổng trọng lượng của cả hàng
 def calculas_total_weight(row):
     sum = 0
     for cont in row:
         sum += cont.weight
     return sum
 
+# hàm đổi vị trí của 2 container
 def swap_pair(left, right, pair_swap):
     temp = left[pair_swap]
     left[pair_swap] = right[pair_swap]
     right[pair_swap] = temp
 
-# row gồm row_left, row_right
-def create_row(row_left, row_right):
 
-    if len(row_left) > len(row_right):
-        row_right.append(Container(0000, -1, 20, 0, None))
-    print("\nleft")
-    print_contain(row_left)
-    print("\nright")
-    print_contain(row_right)
+# row gồm row_left, row_right
+def create_row_BruteForce(row_left, row_right):
 
     # sắp xếp sao cho tổng trọng lượng 2 bên
     # tỉnh tổng trọng lượng 2 bên:
@@ -85,45 +96,81 @@ def create_row(row_left, row_right):
         matrix_balance[r][r - 1] = bias_basic
     # print(matrix_balance)
 
-    #khởi tạo ma trận phương án:
+    # khởi tạo ma trận phương án:
     while matrix_balance[0][0] != matrix_balance[1][0]:
         for r in range(1, len(row_right)):
-            #tìm min sau 1 bước chuyển:
+            # tìm min sau 1 bước chuyển:
             index = 0
             for c in range(r, len(row_left)):
-                matrix_balance[r][c] = matrix_balance[r][c-1] - 2 * (row_left[c].weight - row_right[c].weight)
+                matrix_balance[r][c] = matrix_balance[r][c - 1] - 2 * (row_left[c].weight - row_right[c].weight)
                 if matrix_balance[0][r] > abs(matrix_balance[r][c]):
                     matrix_balance[0][r] = abs(matrix_balance[r][c])
-            # matrix_balance[0][0] = min(matrix_balance[0][1:])
 
         # tìm giá trị min và vị trí min
         for i in range(1, len(matrix_balance[0])):
             if matrix_balance[0][0] > matrix_balance[0][i]:
                 matrix_balance[0][0] = matrix_balance[0][i]
                 index = i
-        # print(matrix_balance)
-        # print(index)
-
-
 
         swap_pair(row_left, row_right, index)
-        # print("\nleft")
-        # print_contain(row_left)
-        # print("\nright")
-        # print_contain(row_right)
 
-        #cập nhật lại độ lệch
+
+        # cập nhật lại độ lệch
         for r in range(1, len(row_right)):
             matrix_balance[r][r - 1] = matrix_balance[index][index]
 
     print(matrix_balance)
 
-    print("\nleft after")
-    print_contain(row_left)
-    print("\nright after")
-    print_contain(row_right)
+    return row_left, row_right
+
+
+def create_row_Greedy(row_left, row_right):
+
+    w_left = calculas_total_weight(row_left)
+    w_right = calculas_total_weight(row_right)
+    bias_basic = w_left - w_right
+
+    # tạo ma trận phương án
+    bias_array = [bias_basic]
+    for i in range(1, len(row_left)):
+        bias_array.append(0)
+    index = 0
+    bias_min = sys.maxsize
+    while bias_array[0] < bias_min:
+
+        for i in range(1, len(row_left)):
+            bias = abs(row_left[i].weight - row_right[i].weight)
+            bias_array[i] = bias
+            if bias_min > bias:
+                bias_min = bias
+                index = i
+        if bias_array[0] > bias_min:
+            bias_array[0] = bias_min
+        swap_pair(row_left, row_right, index)
 
     return row_left, row_right
+
+#sắp xếp container theo hàng
+#input: 2 hàng con
+#output: 1 tier
+def create_row(row_left, row_right):
+    print("trước")
+    print("left \t\t\t\t right")
+    for i in range(len(row_left)):
+        print(row_left[i].stringCont  +"\t"+ row_right[i].stringCont)
+    print("weight: ",calculas_total_weight(row_left),"\t\t\t\t",calculas_total_weight(row_right))
+    # left, right = create_row_BruteForce(row_left, row_right)
+    left, right = create_row_Greedy(row_left, row_right)
+    print("Sau")
+    print("left \t\t\t right")
+    for i in range(len(row_left)):
+        print(row_left[i].stringCont  +"\t"+ row_right[i].stringCont)
+    print(calculas_total_weight(row_left[i]), "\t\t\t\t", calculas_total_weight(row_right[i]))
+    return left, right
+
+
+
+
 # tạo mảng 2 chiều cho khoang: row và tier
 def create_bay(containers):
     bay = []
@@ -144,11 +191,14 @@ def create_bay(containers):
         counter += 1
     if len(tier) != 0:
         print("chưa đủ khay")
-        tier_sorted = create_tier(containers)
+        while len(tier) != 10:
+            tier.append(Container(0000, -1, 20, 0, None))
+        tier_sorted = create_tier(tier)
         bay.append(tier_sorted)
     for t in bay:
         print(t)
     return bay
+
 
 # sinh ra vị trí của các bay cho phù hợp trên con tàu để tàu không lệch.
 def create_position_all_bays(data):
@@ -170,8 +220,9 @@ def create_position_all_bays(data):
         print()
         create_bay(containers)
         # bays.append([id_harbour, no_containers, weight_total, create_bay(containers)])
-    
+
     return []
+
 
 def bubble_sort(containers):
     for i in range(len(containers)):
@@ -181,6 +232,7 @@ def bubble_sort(containers):
                 containers[i] = containers[j]
                 containers[j] = temp
     return containers
+
 
 def sort_weight(containers):
     conts_40 = containers[0]
@@ -201,6 +253,7 @@ def sort_weight(containers):
             conts_40.append(i)
         return conts_40
 
+
 def sort_size(containers):
     size_20 = []
     size_40 = []
@@ -212,17 +265,18 @@ def sort_size(containers):
             size_40.append(cont)
     return [size_40, size_20]
 
+
 def classify_container(containers):
     # print("Phân loại:")
     # ở đây sẽ phân loại theo type of container.
     # 7 loại thường gặp:
-    DC = []     # DC: dry container
-    BC = []     # BC: Bulk container
-    NCC = []    # NCC: Named Cargo Container
-    TC = []     # TC: Thermal Containers
-    OC = []     # OC: Open-top Container
-    TP = []     # TP: Platform Container
-    TAC = []    # TAC: Tank Container
+    DC = []  # DC: dry container
+    BC = []  # BC: Bulk container
+    NCC = []  # NCC: Named Cargo Container
+    TC = []  # TC: Thermal Containers
+    OC = []  # OC: Open-top Container
+    TP = []  # TP: Platform Container
+    TAC = []  # TAC: Tank Container
 
     for container in containers:
         if container.type == "DC":
@@ -240,7 +294,7 @@ def classify_container(containers):
         if container.type == "TAC":
             TAC.append(container)
 
-    #sort size: (đầu ra là mảng [[cont_40],[cont_20]])
+    # sort size: (đầu ra là mảng [[cont_40],[cont_20]])
     DC = sort_size(DC)
     BC = sort_size(BC)
     NCC = sort_size(NCC)
@@ -258,7 +312,7 @@ def classify_container(containers):
     # print("TP",TP[0], TP[1])
     # print("TAC",TAC[0], TAC[1])
 
-    #sort weight:
+    # sort weight:
     # sắp xếp container DC
     DC = sort_weight(DC)
     # sắp xếp container BC
@@ -285,6 +339,7 @@ def classify_container(containers):
 
     return [DC, BC, NCC, TC, OC, TP, TAC]
 
+
 def make_priority(containers_in_harbour):
     # phân loại container
     # print("trc khi")
@@ -300,6 +355,7 @@ def make_priority(containers_in_harbour):
     # for cont in containers_priority:
     #     print(cont.size, cont.weight, cont.type)
     return containers_priority
+
 
 def input(f_data_harbour):
     data = []
@@ -318,7 +374,8 @@ def input(f_data_harbour):
             with open(f_harbour, "r", encoding="utf-8") as file_harbour:
                 for row in file_harbour:
                     data_container = str(row).strip('\n').split("\t")
-                    container = Container(data_container[0], data_container[1], int(data_container[2]), int(data_container[3]),
+                    container = Container(data_container[0], data_container[1], int(data_container[2]),
+                                          int(data_container[3]),
                                           data_container[4])
                     total_weight += int(data_container[3])
                     containers_in_harbour.append(container)
@@ -329,8 +386,10 @@ def input(f_data_harbour):
             data.append([id_harbour, no_container, total_weight, containers_priority])
     return data
 
+
 def output():
     return
+
 
 def main():
     # danh sách các container và hành trình
@@ -339,6 +398,7 @@ def main():
     p = create_position_all_bays(data)
     # output(p)
     return
+
 
 if __name__ == '__main__':
     main()
