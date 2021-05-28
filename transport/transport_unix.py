@@ -5,9 +5,7 @@ import os
 
 
 class Dijkstra:
-   
-
-    def __init__(self, start, end, time="10am"):
+       def __init__(self, start, end, time="10am"):
 
         self.start = start.upper()
         self.end = end.upper()

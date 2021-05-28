@@ -4,32 +4,44 @@ import os
 import platform
 
 
-
 class Dijkstra:
-   
-
-    def __init__(self, start, end, time="10am"):
-
+    def __init__(self, start, end, time, harbours):
         self.start = start.upper()
         self.end = end.upper()
         self.time = time
-        self.train_map = {}
-        self.load_data()
-        self.dijk()
+        self.harbours = harbours
 
-    def load_data(self):
-        file_str = Path('.').absolute()
-        file_str = str(file_str.joinpath('transport').joinpath('routeData.xlsx'))
-        train_df = pd.read_excel(file_str)
-        train_df.columns = ['start', 'destination', 'distance', 'time']
-        for station in set(train_df['start']):
-            connected_stations_df = train_df[train_df['start'] == station]
-            connected_stations = {connected_stations_df.iloc[x, 1]: connected_stations_df.iloc[x, 3]
-                                  for x in range(0, connected_stations_df.shape[0])}
-            self.train_map[station] = connected_stations
+        self.train_map = self.make_train_map(harbours)
+
+        self.route = self.dijk()
+
+    def find_adj(self, name_harbour):
+        list_h_adj = []
+        for h in self.harbours:
+            if h[0] == name_harbour:
+                list_h_adj.append([h[1], float(h[2])])
+        return list_h_adj
+
+    def make_train_map(self, harbours):
+        train_map = {}
+        for h in harbours:
+            start = h[0]
+            end = h[1]
+            dist = float(h[2])
+            val = {}
+            list_h_adj = self.find_adj(start)
+            if list_h_adj != None:
+                for h_adj in list_h_adj:
+                    val[h_adj[0]] = h_adj[1]
+            train_map[start] = val
+        # print(train_map)
+        return train_map
+
+    # train_map{}: key = start
+    # value = {} key =
 
     def lowest_cost(self, costs, processed):
-        lowest = float("inf")
+        lowest = float('inf')
         station_name = None
         for station in costs.keys():
             cost = costs[station]
@@ -41,10 +53,12 @@ class Dijkstra:
     def dijk(self):
         parents = {x: self.start for x in self.train_map[self.start].keys()}
         costs = self.train_map[self.start]
+        # print("costs = ", costs)
         processed = []
         for station in self.train_map.keys():
             if station not in costs.keys():
                 costs[station] = float('inf')
+        # print("costs = ", costs)
         current_stop = self.lowest_cost(costs, processed)
         while current_stop is not None:
             cost = costs[current_stop]
@@ -57,159 +71,75 @@ class Dijkstra:
                     parents[n] = current_stop
             processed.append(current_stop)
             current_stop = self.lowest_cost(costs, processed)
-        print('Time to get from {0} to {1} is: {2} minutes.'.format(
-            self.start, self.end, costs[self.end]))
+        print('Time to get from {0} to {1} is: {2} KM.'.format(self.start, self.end, costs[self.end]))
         last = self.end
         route = [self.end]
         while last != self.start:
             last = parents[last]
             route += [last]
         # print('Stops along the way: {0}'.format(route))
-        outDijk = open('outDijk.txt', 'w')
-        outDijk.write('Time to get from {0} to {1} is: {2} minutes.'.format(
-            self.start, self.end, costs[self.end]))
-        outDijk.write('\n')
-        for i in reversed(route):
-            # print(i)
-            outDijk.write(i)
-            if i != route[0]:
-                outDijk.write("->")
-        # outDijk.write(str(cost))
-        outDijk.close()
-        f = open('data.txt', 'w')
-        for i in reversed(route):
-            print(i)
-            f.write(i)
-            f.write("\n")
-        f.close()
-        # print(costs)
 
-#in ra so cac container trong cac cang
-slash = '/'
-if platform.system() == "Windows":
-    slash = '\\'
-path = (Path('.').absolute())
-# print(path)
-path = str(path.joinpath('transport').joinpath('port'))
-list_dir = os.listdir(path)
+        return route
 
-temp = os.getcwd()
-# print(temp)
-temp = str(temp + slash + 'transport')
 
-for file in list_dir:
+def makeDijkstra(harbours):
+    l_h = set([h[0] for h in harbours])
+    l_h = sorted(list(l_h))
 
-    if file == "A.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countA = 0
+    start = "A"
+    end = "E"
 
+    # sort harbour theo cot thoi gian tra hang
+    for s_h in l_h:
+        for e_h in l_h:
+            D = Dijkstra(s_h, e_h, '10am', harbours)
+
+            print(D.route[::-1])
+
+    D = Dijkstra('A', 'E', '10am', harbours)
+
+    # print(D.route)
+    return start, end, reversed(D.route)
+
+
+def inputHarbours(path):
+    with open(path, "r", encoding="utf-8") as f:
+        harbours = []
         for line in f:
-            if line != "\n":
-                countA +=1
-        f.close()
+            harbour = line.strip("\n").split("\t")
+            harbours.append(harbour)
+
+    # for h in harbours:
+    #     print(h)
+    return harbours
 
 
-
-    if file == "B.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countB = 0
-
-        for line in f:
-            if line != "\n":
-                countB +=1
-        f.close()
+def get_info_har(harbours, name_har):
+    for h in harbours:
+        if h[0] == name_har:
+            return h
 
 
+def output_route(path_out, s, e, route, harbours):
+    outDijk = open(path_out + 'outDijk.txt', 'w', encoding="utf-8")
 
-    if file == "C.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countC = 0
+    har = get_info_har(harbours, s)
 
-        for line in f:
-            if line != "\n":
-                countC +=1
-        f.close()
-
-
-
-    if file == "D.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countD = 0
-
-        for line in f:
-            if line != "\n":
-                countD +=1
-        f.close()
-
-
-
-    if file == "E.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countE = 0
-
-        for line in f:
-            if line != "\n":
-                countE +=1
-        f.close()
-
-
-
-    if file == "F.txt":
-        f = open(temp + slash + "port" + slash + file, 'r')
-        countF = 0
-
-        for line in f:
-            if line != "\n":
-                countF +=1
-        f.close()
-
+    f = open(path_out + 'route.txt', 'w', encoding="utf-8")
+    for i in route:
+        har = get_info_har(harbours, i)
+        print(i)
+        f.write(har[0] + "\t" + har[4])
+        f.write("\n")
+    f.close()
 
 
 if __name__ == '__main__':
+    path = "D:/GitHub/DAAlgo/data.txt"
+    harbours = inputHarbours(path)
 
-    # start = "HARROW & WEALDSTONE"
-    # end = "WATERLOO"
-    # time = "10am"
-    Dijkstra('A', 'F', '3')
-    # a = Dijkstra('A', 'E', '10am')
-    # print(a.train_map)
-    # print(tem)
-    # result = temp.time_check()
+    s, e, route = makeDijkstra(harbours)
 
-    with open('data.txt', "r+") as f:
-        content = f.read()
-        output = ("output.txt","x")
-
-        with open("output.txt", "w") as o:
-
-
-
-            for line in content:
-                if "A" in line:
-                    line = "A" + "\t" + str(countA)
-                    o.write(line)
-                    o.write("\n")
-                if "B" in line:
-                    line = "B" + "\t" + str(countB)
-                    o.write(line)
-                    o.write("\n")
-                if "C" in line:
-                    line = "C" + "\t" + str(countC)
-                    o.write(line)
-                    o.write("\n")
-                if "D" in line:
-                    line = "D" + "\t" + str(countD)
-                    o.write(line)
-                    o.write("\n")
-                if "E" in line:
-                    line = "E" + "\t" + str(countE)
-                    o.write(line)
-                    f.write("\n")
-                if "F" in line:
-                    line = "F" + "\t" + str(countF)
-                    o.write(line)
-                    o.write("\n")
-                    
-    # with open("output.txt", "r+") as file:
-    #     content = file.read()
-    #     file.write(content[:-1])
+    # path_out = "D:/GitHub/DAAlgo/"
+    #
+    # output_route(path_out, s, e, route, harbours)
