@@ -2,9 +2,11 @@ import pandas as pd
 from pathlib import Path
 import os
 import platform
+import sys
+import operator
+sys.setrecursionlimit(1000)
 
-
-class Dijkstra:
+class MinPath:
     def __init__(self, start, end, time, harbours):
         self.start = start.upper()
         self.end = end.upper()
@@ -13,7 +15,7 @@ class Dijkstra:
 
         self.train_map = self.make_train_map(harbours)
 
-        self.route = self.dijk()
+        # self.route = self.dijk()
 
     def find_adj(self, name_harbour):
         list_h_adj = []
@@ -40,67 +42,109 @@ class Dijkstra:
     # train_map{}: key = start
     # value = {} key =
 
-    def lowest_cost(self, costs, processed):
-        lowest = float('inf')
-        station_name = None
-        for station in costs.keys():
-            cost = costs[station]
-            if cost < lowest and station not in processed:
-                station_name = station
-                lowest = cost
-        return station_name
 
-    def dijk(self):
-        parents = {x: self.start for x in self.train_map[self.start].keys()}
-        costs = self.train_map[self.start]
-        # print("costs = ", costs)
-        processed = []
-        for station in self.train_map.keys():
-            if station not in costs.keys():
-                costs[station] = float('inf')
-        # print("costs = ", costs)
-        current_stop = self.lowest_cost(costs, processed)
-        while current_stop is not None:
-            cost = costs[current_stop]
-            # print(self.train_map[current_stop])
-            neighbours = self.train_map[current_stop]
-            for n in neighbours.keys():
-                new_cost = cost + neighbours[n]
-                if new_cost < costs[n]:
-                    costs[n] = new_cost
-                    parents[n] = current_stop
-            processed.append(current_stop)
-            current_stop = self.lowest_cost(costs, processed)
-        print('Time to get from {0} to {1} is: {2} KM.'.format(self.start, self.end, costs[self.end]))
-        last = self.end
-        route = [self.end]
-        while last != self.start:
-            last = parents[last]
-            route += [last]
-        # print('Stops along the way: {0}'.format(route))
+    def try_node(self, current, n, visited, neighbor, route, dist, f):
+        if self.start == self.end:
+            return -1 
+        if route[current] == self.end:
 
-        return route
+            for i in range(0, n):
+                f.write(route[i] + "\t")
+            f.write(str(dist[n - 1]) + "\n")
+
+        while len(neighbor[current]) > 0:
+            x = (neighbor[current])[0][1]
+            route[current + 1] = neighbor[current].pop(0)[0]
+            if route[current + 1] not in visited and route[current + 1] != self.start:
+                dist.append(x + dist[current])
+
+                visited.append(route[current + 1])
+                if current + 1 == n - 1 and route[current + 1] == self.end:
+
+                    neighbor[current + 1] = self.find_adj(route[current + 1])
+                    return self.try_node(current + 1 , n, visited, neighbor, route, dist, f)
+                elif current + 1 == n - 1 and route[current + 1] != self.end:
+                    visited.remove(route[current + 1])
+                    dist.pop(current + 1)
+                elif current + 1 < n - 1 and route[current + 1] == self.end:
+                    visited.remove(route[current + 1])
+                    dist.pop(current + 1)
+
+                elif current + 1 < n:
+                    neighbor[current + 1] = self.find_adj(route[current + 1])
+                    return self.try_node(current + 1 , n, visited, neighbor, route, dist, f)
+
+                if current + 1 > len(visited):
+                    visited.remove(route[current + 1])
+                    dist.pop(current + 1)
+        if current > 0:
+            visited.remove(route[current])
+            dist.pop(current)
+            return self.try_node(current - 1 , n, visited, neighbor, route, dist, f)
 
 
-def makeDijkstra(harbours):
-    l_h = set([h[0] for h in harbours])
-    l_h = sorted(list(l_h))
+    def find_min_path(self, harbours, path_out):
+        train_map = self.make_train_map(harbours)
+        node = list(train_map.keys())
+        n = len(node)
+        # danh dau trang thai
+        visited = []
+        # bang phuong an
+        route = ["NULL"]*(n+1)
+        route[0] = self.start
 
-    start = "A"
-    end = "E"
+        neighbor = ["NULL"]*(n)
+        visited.append(self.start)
+        current_dist = 0
+        current = 0
 
-    # sort harbour theo cot thoi gian tra hang
-    for s_h in l_h:
-        for e_h in l_h:
-            D = Dijkstra(s_h, e_h, '10am', harbours)
+        dist = []
+        dist.append(float(0))
+        neighbor[current] = self.find_adj(route[current])
+        result = []
+        min = float('inf')
+        temp = -1
 
-            print(D.route[::-1])
+        f = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
+        self.try_node(current, n, visited, neighbor, route, dist, f)
+        f.close()
+        
+        out_file = open(path_out + 'outTrans.txt', 'r', encoding="utf-8")
 
-    D = Dijkstra('A', 'E', '10am', harbours)
+        for line in out_file:
+            result.append(line.strip("\n").split("\t"))
+        out_file.close()
 
-    # print(D.route)
-    return start, end, reversed(D.route)
+        for i in range(0, len(result)):
+            if float(result[i][n]) < min:
+                min = float(result[i][n])
+                temp = i
 
+        file = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
+        
+        if temp != -1:
+            print(result[temp])
+            file.write("Shortest path from " + self.start + " to " + self.end + ": " + str(result[temp][n]) + "\n" + "Route: ")
+            for i in range(0, n):
+                file.write(result[temp][i])
+                if i != n - 1:
+                    file.write(" -> ")
+        else:
+            print("No route!")
+            file.write("No route!")
+        file.close()
+
+        output = open(path_out + 'output.txt', 'w', encoding="utf-8")
+        
+        if temp != -1:
+            for i in range(0, n):
+                output.write(result[temp][i] + "\n")
+        output.close()
+        out_route = []
+        if temp != -1:
+            out_route = result[temp][:n]
+            
+        return self.start, self.end, (out_route)
 
 def inputHarbours(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -121,7 +165,7 @@ def get_info_har(harbours, name_har):
 
 
 def output_route(path_out, s, e, route, harbours):
-    outDijk = open(path_out + 'outDijk.txt', 'w', encoding="utf-8")
+    # outTrans = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
 
     har = get_info_har(harbours, s)
 
@@ -135,11 +179,15 @@ def output_route(path_out, s, e, route, harbours):
 
 
 if __name__ == '__main__':
-    path = "D:/GitHub/DAAlgo/data.txt"
+    path = "D:/DAAlgo/data.txt"
+    # path_out = "D:/GitHub/DAAlgo/"
+    path_out = "D:/DAAlgo/"
+    # path_out = "D:/GitHub/DAAlgo/data.txt"
+
     harbours = inputHarbours(path)
 
-    s, e, route = makeDijkstra(harbours)
+    D = MinPath("A", "E", "10am", harbours)
+    D.find_min_path(harbours, path_out)
+    s, e, route = D.find_min_path( harbours, path_out)
 
-    # path_out = "D:/GitHub/DAAlgo/"
-    #
-    # output_route(path_out, s, e, route, harbours)
+    output_route(path_out, s, e, route, harbours)
