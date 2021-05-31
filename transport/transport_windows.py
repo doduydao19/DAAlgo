@@ -123,8 +123,8 @@ class MinPath:
         file = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
         
         if temp != -1:
-            print(result[temp])
-            file.write("Shortest path from " + self.start + " to " + self.end + ": " + str(result[temp][n]) + "\n" + "Route: ")
+            # print(result[temp])
+            file.write("Shortest path from " + self.start + " to " + self.end + ": " + str(result[temp][n]) + " km\n" + "Route: ")
             for i in range(0, n):
                 file.write(result[temp][i])
                 if i != n - 1:
@@ -143,7 +143,7 @@ class MinPath:
         out_route = []
         if temp != -1:
             out_route = result[temp][:n]
-            
+
         return self.start, self.end, (out_route)
 
 def inputHarbours(path):
@@ -179,10 +179,10 @@ def output_route(path_out, s, e, route, harbours):
 
 
 if __name__ == '__main__':
-    path = "D:/DAAlgo/data.txt"
-    # path_out = "D:/GitHub/DAAlgo/"
-    path_out = "D:/DAAlgo/"
-    # path_out = "D:/GitHub/DAAlgo/data.txt"
+    path = "D:/GitHub/DAAlgo/data.txt"
+    # path = "D:/DAAlgo/data.txt"
+    path_out = "D:/GitHub/DAAlgo/"
+    # path_out = "D:/DAAlgo/"
 
     harbours = inputHarbours(path)
 
