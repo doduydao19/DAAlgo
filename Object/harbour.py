@@ -23,18 +23,21 @@ class Harbour:
             conts += container.stringContainer() + "\n"
         return conts[:-1]
 
-def inputHarbour():
-    name_harbour = input("Nhap ten cang:")
-    src_harbour = input("Nhap diem xuat phat:")
-    dst_harbour = input("Nhap diem den:")
-    dis_harbour = input("Nhap khoang cach:")
-    time_harbour = input("Nhap thoi gian:")
-    no_container = int(input("Nhap so luong:"))
-    containers = []
-    for cont in range(no_container):
-        print("Nhap container thu:", cont+1)
-        containers.append(container.inputContainer())
-    return Harbour(name_harbour, src_harbour, dst_harbour, dis_harbour, time_harbour, no_container, containers)
+def inputHarbour(source, dest, dist, add):
+    if add == True:
+    # name_harbour = input("Nhap ten cang:")
+    # src_harbour = input("Nhap diem xuat phat:")
+    # dst_harbour = input("Nhap diem den:")
+    # dis_harbour = input("Nhap khoang cach:")
+    # time_harbour = input("Nhap thoi gian:")
+        no_container = int(input("Nhập số lượng container:"))
+        containers = []
+        for cont in range(no_container):
+            print("Nhap container thu:", cont+1)
+            containers.append(container.inputContainer())
+        return Harbour(source, source,dest, dist, int(dist)/60, no_container, containers)
+    else:
+        return Harbour(source, source, dest, dist, int(dist) / 60, 0, None)
 
 def printHarbour(harbour):
     print(harbour.stringHarbour())

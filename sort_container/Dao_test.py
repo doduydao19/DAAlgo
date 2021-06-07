@@ -106,9 +106,6 @@ def sort_bay(tiers):
     #         print(row)
 
 
-# kiểm tra xem tổng trọng lượng hàng hóa đã đủ hay chưa?
-def isFull():
-    return False
 
 
 # hàm tạo ra 1 tier:
