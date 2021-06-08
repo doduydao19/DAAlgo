@@ -684,7 +684,9 @@ def output(bays):
                         # print(type(cont.stringContainer()))
                         content = cont.stringContainer()
                         text += content + "\n"
+        text += "\n"
     print(text)
+
 
     f_out = open("out.txt", "w")
     f_out.write(str(text))
