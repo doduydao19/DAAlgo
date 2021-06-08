@@ -181,7 +181,7 @@ def output_route(path_out, s, e, route, harbours):
 def make_route_auto(source, dest):
     path = "data1.txt"
     # path = "D:/DAAlgo/data1.txt"
-    path_out = "D:/GitHub/DAAlgo/"
+    path_out = ""
     # path_out = "D:/DAAlgo/"
 
     harbours = inputHarbours(path)
