@@ -66,7 +66,7 @@ def input_Harbours():
         return None
 
 def output_harbours(harbours):
-    fileName = "data.txt"
+    fileName = "data1.txt"
     with open(fileName, "wt", encoding="utf-8") as f:
         for h in harbours:
             print(h.infoHarbour())

@@ -49,11 +49,11 @@ def sort_bay(tiers):
     tier_left = []
     tier_right = []
     for id in range(len(tiers)):
-        tier_left.append([calculas_total_weight(tiers[id][0]), 0])
-        tier_right.append([calculas_total_weight(tiers[id][1]), 1])
+        tier_left.append((calculas_total_weight(tiers[id][0]), 0))
+        tier_right.append((calculas_total_weight(tiers[id][1]), 1))
 
-    tier_left.append([0, 0])
-    tier_right.append([0, 1])
+    # tier_left.append((0, 0))
+    # tier_right.append((0, 1))
 
     # print("Sắp xếp để độ lệch của các hàng trên cùng nhiều tier là nhỏ nhất")
     w_left = 0
@@ -61,11 +61,13 @@ def sort_bay(tiers):
     for i in range(len(tier_left)):
         w_left += tier_left[i][0]
         w_right += tier_right[i][0]
-        # print(tier_left[i], tier_right[i])
+        print(tier_left[i], tier_right[i])
     # print(w_left, w_right)
     # print("****sắp xếp bằng thuật toán tham lam:")
 
+
     bias_basic = abs(w_left - w_right)
+    print("Độ lệch ban đầu của bay", bias_basic)
 
     # tạo ma trận phương án
     bias_array = [bias_basic]
@@ -82,11 +84,18 @@ def sort_bay(tiers):
                 swap_pair(tier_left, tier_right, index)
 
             for i in range(1, len(tier_left)):
-                bias = abs(bias_array[0] - 2 * abs(tier_left[i][0] - tier_right[i][0]))
+                # bias = abs(bias_array[0] - 2 * abs(tier_left[i][0] - tier_right[i][0]))
+                bias = find_abs(bias_array[0], tier_left, tier_right, i)
                 bias_array[i] = bias
-                if bias_min > bias:
-                    bias_min = bias
-                    index = i
+            # print(bias_array)
+            min_bia = sys.maxsize
+            for b in range(1, len(tier_left)):
+                if min_bia >= bias_array[b][0]:
+                    min_bia = bias_array[b][0]
+                    if bias_min > bias_array[b][1]:
+                        bias_min = bias_array[b][1]
+                        index = b
+
 
     # print("Sau khi xếp:")
     left = []
@@ -98,12 +107,23 @@ def sort_bay(tiers):
                 tiers[i][0] = tiers[i][1]
                 tiers[i][1] = temp
             # print(tier_left[i], tier_right[i])
-
     # print("**Sau khi xếp bay: ")
     # for tier in tiers:
     #     for row in tier:
     #         print(row)
+    w_left = 0
+    w_right = 0
+    print("sau")
+    for i in range(len(tier_left)):
+        w_left += tier_left[i][0]
+        w_right += tier_right[i][0]
+        print(tier_left[i], tier_right[i])
 
+
+    bias_basic = abs(w_left - w_right)
+    print("Độ lệch sau", bias_basic)
+
+    # print(c)
 
 # hàm tạo ra 1 tier:
 # input: danh sách containers
@@ -197,7 +217,10 @@ def swap_pair(left, right, pair_swap):
 
 def find_abs(b_pre, row_left, row_right, index):
     bias_arr = []
-    for j in range(index, 5):
+    # for r in row_left:
+    #     print(r)
+
+    for j in range(index, len(row_left)):
         if type(row_left[j]) is tuple:
             b_pre = b_pre - 2 * abs(row_left[j][0] - row_right[j][0])
         else:
@@ -280,17 +303,19 @@ def create_row_Greedy(row_left, row_right):
             bias = find_abs(bias_array[0], row_left, row_right, i)
             # print(bias)
             bias_array[i] = bias
-        # print(bias_array)
+        print(bias_array)
 
         min_bia = sys.maxsize
-        for b in range(2, 5):
+        for b in range(1, len(row_left)):
             if min_bia >= bias_array[b][0]:
                 min_bia = bias_array[b][0]
                 if bias_min > bias_array[b][1]:
                     bias_min = bias_array[b][1]
+                    index = b
 
     # print(row_left)
     # print(row_right)
+    # print(c)
     return row_left, row_right
 
 
@@ -298,19 +323,20 @@ def create_row_Greedy(row_left, row_right):
 # input: 2 hàng con
 # output: 1 tier
 def create_row(row_left, row_right):
-    # print("trước")
-    # print("left \t\t\t\t right")
-    # for i in range(len(row_left)):
-    #     print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
-    # print("weight: ", calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
+    print("trước")
+    print("left \t\t\t\t right")
+    for i in range(len(row_left)):
+        print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
+    print("weight: ", calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
 
     left, right = create_row_Greedy(row_left, row_right)
-    # left, right = create_row_BruteForce(row_left, row_right)
-    # print("Sau")
-    # print("left \t\t\t right")
-    # for i in range(len(row_left)):
-    #     print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
-    # print(calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
+    left, right = create_row_BruteForce(row_left, row_right)
+    print("Sau")
+    print("left \t\t\t right")
+    for i in range(len(row_left)):
+        print(row_left[i].stringCont + "\t" + row_right[i].stringCont)
+    print(calculas_total_weight(row_left), "\t\t\t\t", calculas_total_weight(row_right))
+    print(c)
     return left, right
 
 
@@ -385,11 +411,19 @@ def create_bay(containers):
         tier_sorted = create_tier(tier)
         bay.append(tier_sorted)
 
+
+    # bias_basic = 0
+    # left = 0
+    # right = 0
     # for t in bay:
+    #     temp = 0
     #     for x in t:
     #         for j in x:
-    #             print(j.stringContainer())
-    #         print()
+    #             # print(j.stringContainer())
+    #         # print()
+    #             temp += j.weight
+
+
     sort_bay(bay)
 
     return bay
@@ -700,7 +734,7 @@ def sort_container():
     f_data_harbour = "data.txt"
     data = input(f_data_harbour)
     bays = create_position_all_bays(data)
-    output(bays)
+    # output(bays)
     return
 
 # if __name__ == '__main__':

@@ -169,7 +169,7 @@ def output_route(path_out, s, e, route, harbours):
 
     # har = get_info_har(harbours, s)
 
-    f = open(path_out + 'route.txt', 'w', encoding="utf-8")
+    f = open(path_out + 'data.txt', 'w', encoding="utf-8")
     for i in route:
         har = get_info_har(harbours, i)
         print(i)
@@ -179,8 +179,8 @@ def output_route(path_out, s, e, route, harbours):
 
 
 def make_route_auto(source, dest):
-    path = "data.txt"
-    # path = "D:/DAAlgo/data.txt"
+    path = "data1.txt"
+    # path = "D:/DAAlgo/data1.txt"
     path_out = "D:/GitHub/DAAlgo/"
     # path_out = "D:/DAAlgo/"
 

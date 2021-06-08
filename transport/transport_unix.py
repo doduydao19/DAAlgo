@@ -73,7 +73,7 @@ class Dijkstra:
                 outDijk.write("->")
         # outDijk.write(str(cost))
         outDijk.close()
-        f = open('data.txt', 'w')
+        f = open('data1.txt', 'w')
         for i in reversed(route):
             print(i)
             f.write(i)
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     # print(tem)
     # result = temp.time_check()
 
-    with open('data.txt', "r+") as f:
+    with open('data1.txt', "r+") as f:
         content = f.read()
         output = ("output.txt","x")
 

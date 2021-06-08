@@ -427,7 +427,7 @@ def output():
 
 def main():
     # danh sách các container và hành trình
-    f_data_harbour = "data.txt"
+    f_data_harbour = "data1.txt"
     data = input(f_data_harbour)
     p = create_position_all_bays(data)
     # output(p)
