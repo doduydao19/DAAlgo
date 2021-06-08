@@ -1,27 +1,7 @@
 from Object import harbour as hObj
 from transport import transport_windows
-from sort_container import Dao_test
+from sort_container import sortContainer
 import os
-
-def find_har(har, data, dest, id, max):
-    if id >= max:
-        return
-    else:
-        for d in data:
-            for h in d:
-                if h[0] == har:
-                    if h in dest:
-                        continue
-                    else:
-                        dest.append(h)
-                        id += 1
-                        # print(h)
-                        find_har(h[1], data, dest, id, max)
-
-                # if h[1] == har:
-                #     dest.add(h)
-                #     id += 1
-                #     find_har(h[0], data, dest, id, max)
 
 def find_distance(source, dest, data):
     for d in data:
@@ -48,21 +28,13 @@ def input_Harbours():
                 no_rel += len(harbour)
                 data.append(harbour)
                 harbour = []
+        f.close()
     for d in data:
         print(d)
     print("Danh sánh các cảng biển hiện tại:")
     print(sorted(all_harbour))
+
     har_name = input("Nhập tên cảng muốn xuất phát: ")
-    # # print(har_name)
-    # dest = list()
-    # find_har(har_name, data, dest, 0, no_rel)
-    # dest_name = set()
-    # for d in dest:
-    #     dest_name.add(d[0])
-    #     dest_name.add(d[1])
-    # dest_name.remove(har_name)
-    # print("Các cảng có thể đi tới là:")
-    # print(sorted(dest_name))
 
     if har_name != None:
         print("Nhập tên các cảng muốn tới (\"None\" để dừng):")
@@ -80,6 +52,7 @@ def input_Harbours():
                     print("Chưa có cảng nào được nhập vào. Vui lòng nhập lại")
         pass
         print(destinations)
+
         harbours = []
         for h in range(len(destinations)):
             print("Nhập cảng thứ", h + 1)
@@ -94,23 +67,39 @@ def input_Harbours():
 
 def output_harbours(harbours):
     fileName = "data.txt"
-    with open(fileName, "w", encoding="utf-8") as f:
+    with open(fileName, "wt", encoding="utf-8") as f:
         for h in harbours:
             print(h.infoHarbour())
-            f.write(h.infoHarbour())
+            text = h.infoHarbour()
+            f.write(text)
 
 def output_containers(harbours):
     folderName = "data"
-    os.mkdir(folderName)
+    if os.path.isdir(folderName) == False:
+        os.mkdir(folderName)
     for h in harbours:
         fileName = folderName + "/" + h.name
         with open(fileName, "w", encoding="utf-8") as f:
             f.write(h.infoContainer())
 
+def input_auto():
+    transport_windows.make_route_auto("A", "E")
+
+def output_auto():
+    sortContainer.sort_container()
+
 def main():
-    hs = input_Harbours()
-    output_harbours(hs)
-    # output_containers(hs)
+    print("Ấn 1 để nhập thủ công, ấn 2 để nhập từ file.")
+    choose = int(input("Lựa chọn là: "))
+
+    if choose == 1:
+        hs = input_Harbours()
+        output_harbours(hs)
+        output_containers(hs)
+
+    if choose == 2:
+        input_auto()
+        output_auto()
 
 if __name__ == '__main__':
     main()

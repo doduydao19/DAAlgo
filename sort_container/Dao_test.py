@@ -106,25 +106,67 @@ def sort_bay(tiers):
     #         print(row)
 
 
-
-
 # hàm tạo ra 1 tier:
 # input: danh sách containers
 # output: ma trận 2*5
 def create_tier(containers):
-    # print("trc")
-    # for cont in containers:
-    #     print(cont.stringCont)
+    row_left = []
+    row_right = []
+    # print(len(containers))
+    check = False
+    for cont in containers:
+        if cont.size == 40:
+            check = True
+            break
+    if check == True:
+        row_high = []
+        row_low = []
+        for c in range(0, len(containers), 2):
+            if containers[c].size == 40:
+                w = containers[c].weight / 2
+                row_high.append((w, containers[c]))
+                row_low.append((w, containers[c]))
+            else:
+                if len(row_high) < 5:
+                    row_high.append((containers[c].weight, containers[c]))
+                else:
+                    row_low.append((containers[c].weight, containers[c]))
+        # print(row_high)
+        # print(row_low)
+        right = [(row_high[i][0] + row_low[i][0],(row_high[i][1], row_low[i][1])) for i in range(0, 5)]
+        # print(right)
+        row_high = []
+        row_low = []
+        for c in range(1, len(containers), 2):
+            if containers[c].size == 40:
+                w = containers[c].weight / 2
+                row_high.append((w,containers[c]))
+                row_low.append((w,containers[c]))
+            else:
+                if len(row_high) < 5:
+                    row_high.append((containers[c].weight, containers[c]))
+                else:
+                    row_low.append((containers[c].weight, containers[c]))
+        if len(row_low) < 5:
+            row_low.append((containers[-1].weight, containers[-1]))
 
-    sort_weight([containers, []])
-    # sort_size(containers)
+        left = [(row_high[i][0] + row_low[i][0],(row_high[i][1], row_low[i][1])) for i in range(0, 5)]
 
-    # print("sau")
-    # for cont in containers:
-    #     print(cont.stringCont)
+        # for l in left:
+        #     print(l[0], l[1][0].stringContainer(), l[1][1].stringContainer())
 
-    # cắt thành 2 dãy
-    row_left, row_right = create_row(containers[0:len(containers):2], containers[1:len(containers):2])
+        left, right = create_row(left, right)
+
+        for l in left:
+            print(l[0], l[1][0].stringContainer(), l[1][1].stringContainer())
+        row_left = [x[1] for x in left]
+        row_right = [x[1] for x in right]
+
+        return row_left, row_right
+    else:
+        sort_weight([[], containers])
+        # cắt thành 2 dãy
+        row_left, row_right = create_row(containers[1:len(containers):2], containers[0:len(containers)-1:2])
 
     left = []
     for cont in row_left:
@@ -136,7 +178,7 @@ def create_tier(containers):
         if cont.weight != 0:
             right.append(cont)
         # print(cont.stringCont)
-    return [row_left, row_right]
+    return [left, right]
 
 
 # hàm tính tổng trọng lượng của cả hàng
@@ -152,6 +194,17 @@ def swap_pair(left, right, pair_swap):
     temp = left[pair_swap]
     left[pair_swap] = right[pair_swap]
     right[pair_swap] = temp
+
+def find_abs(b_pre ,row_left,row_right,index):
+    bias_arr = []
+    for j in range(index, 5):
+        if type(row_left[j]) is tuple:
+            b_pre = b_pre - 2*abs(row_left[j][0] - row_right[j][0])
+        else:
+            b_pre = b_pre - 2 * abs(row_left[j].weight - row_right[j].weight)
+        bias_arr.append(abs(b_pre))
+    bias_min = min(bias_arr)
+    return bias_min, bias_arr[0]
 
 
 # row gồm row_left, row_right
@@ -199,10 +252,18 @@ def create_row_BruteForce(row_left, row_right):
 
 def create_row_Greedy(row_left, row_right):
     # print("****sắp xếp bằng thuật toán tham lam:")
-    w_left = calculas_total_weight(row_left)
-    w_right = calculas_total_weight(row_right)
-    bias_basic = w_left - w_right
 
+    w_left = 0
+    w_right = 0
+    # print(row_left)
+    if type(row_left[0]) is tuple:
+        w_left = sum(e[0] for e in row_left)
+        w_right = sum(e[0] for e in row_right)
+    else:
+        w_left = calculas_total_weight(row_left)
+        w_right = calculas_total_weight(row_right)
+    bias_basic = abs(w_left - w_right)
+    # print(bias_basic)
     # tạo ma trận phương án
     bias_array = [bias_basic]
     for i in range(1, len(row_left)):
@@ -215,14 +276,21 @@ def create_row_Greedy(row_left, row_right):
         if bias_array[0] > bias_min:
             bias_array[0] = bias_min
             swap_pair(row_left, row_right, index)
-
         for i in range(1, len(row_left)):
-            bias = abs(bias_array[0] - 2 * (row_left[i].weight - row_right[i].weight))
+            bias = find_abs(bias_array[0], row_left, row_right, i)
+                # print(bias)
             bias_array[i] = bias
-            if bias_min > bias:
-                bias_min = bias
-                index = i
+        # print(bias_array)
 
+        min_bia = sys.maxsize
+        for b in range(2, 5):
+            if min_bia >= bias_array[b][0]:
+                min_bia = bias_array[b][0]
+                if bias_min > bias_array[b][1]:
+                    bias_min = bias_array[b][1]
+
+    # print(row_left)
+    # print(row_right)
     return row_left, row_right
 
 
@@ -246,6 +314,33 @@ def create_row(row_left, row_right):
     return left, right
 
 
+def make_tier_2D(tier):
+    tier2D = []
+    count = 0
+    # print("trước")
+    # for cont in tier:
+    #     print(cont.stringContainer())
+
+    tier = sort_size(tier)
+    tier = sort_weight(tier)
+
+
+    count = 0
+    for c in tier:
+        if c.size == 40:
+            count+=2
+        else:
+            count+=1
+
+    while count < 20:
+        tier.append(Container(0000, -1, 20, 0, None))
+        count+=1
+    # print("sau")
+    # for cont in tier:
+    #     print(cont.stringContainer())
+    return tier
+
+
 # tạo mảng 2 chiều cho khoang: row và tier
 def create_bay(containers):
     bay = []
@@ -253,27 +348,53 @@ def create_bay(containers):
     tier = []
     no_conts = len(containers)
     # số cont nhỏ hơn 10 thì phải xây tạo tier riêng với. Hoặc với gộp với các lô hàng của cảng khác.
+    
+    # for g in containers:
+    #     print(g.stringContainer())
+    #
     # print("Tạo Bay: ")
+
     for container in containers:
         if counter <= 10:
             tier.append(container)
         else:
-            # print("đủ khay")
+            check = False
+            for cont in tier:
+                if cont.size == 40:
+                    check = True
+                    break
+            if check == True:
+                tier = make_tier_2D(tier)
             tier_sorted = create_tier(tier)
             bay.append(tier_sorted)
             tier = []
             counter = 0
         counter += 1
+
     if len(tier) != 0:
         # print("chưa đủ khay")
-        while len(tier) != 10:
-            tier.append(Container(0000, -1, 20, 0, None))
+        check = False
+        for cont in tier:
+            if cont.size == 40:
+                check = True
+                break
+        if check == True:
+            tier = make_tier_2D(tier)
+        else:
+            while len(tier) != 10:
+                tier.append(Container(0000, -1, 20, 0, None))
         tier_sorted = create_tier(tier)
         bay.append(tier_sorted)
+
     # for t in bay:
-    #     print(t)
+    #     for x in t:
+    #         for j in x:
+    #             print(j.stringContainer())
+    #         print()
     sort_bay(bay)
+
     return bay
+
 
 def generate_position(id, tier_id, row_id, cont_id):
     pos = ""
@@ -299,6 +420,7 @@ def generate_position(id, tier_id, row_id, cont_id):
     pos += row_id
 
     return pos
+
 
 # sinh ra vị trí của các bay cho phù hợp trên con tàu để tàu không lệch.
 def create_position_all_bays(data):
@@ -368,21 +490,51 @@ def bubble_sort(containers):
     return containers
 
 
+def quickSort(containers):
+    # print("quick sort", containers)
+    quick_sort(containers, 0, len(containers) - 1)
+
+
+def partition(containers, l, h):
+    i = (l - 1)
+    pivot = containers[h]
+    for j in range(l, h):
+        if containers[j].weight >= pivot.weight:
+            i = i + 1
+            containers[i], containers[j] = containers[j], containers[i]
+    containers[i + 1], containers[h] = containers[h], containers[i + 1]
+    return (i + 1)
+
+
+def quick_sort(containers, l, h):
+    if len(containers) == 1:
+        return containers
+    if l < h:
+        pi = partition(containers, l, h)
+        quick_sort(containers, l, pi - 1)
+        quick_sort(containers, pi + 1, h)
+
+
 def sort_weight(containers):
     conts_40 = containers[0]
     conts_20 = containers[1]
     if len(conts_40) == 0 and len(conts_20) == 0:
         return
     if len(conts_40) == 0 and len(conts_20) > 0:
-        bubble_sort(conts_20)
+        # bubble_sort(conts_20)
+        quickSort(conts_20)
         return conts_20
 
     if len(conts_20) == 0 and len(conts_40) > 0:
-        bubble_sort(conts_40)
+        # bubble_sort(conts_40)
+        quickSort(conts_40)
         return conts_40
+
     else:
-        bubble_sort(conts_40)
-        bubble_sort(conts_20)
+        # bubble_sort(conts_40)
+        # bubble_sort(conts_20)
+        quickSort(conts_20)
+        quickSort(conts_40)
         for i in conts_20:
             conts_40.append(i)
         return conts_40
@@ -393,7 +545,7 @@ def sort_size(containers):
     size_40 = []
 
     for cont in containers:
-        if cont.size == "20":
+        if cont.size == 20:
             size_20.append(cont)
         else:
             size_40.append(cont)
@@ -524,7 +676,6 @@ def input(f_data_harbour):
 
 
 def output(bays):
-
     text = ""
     for tiers in bays:
         for tier in tiers:
@@ -533,14 +684,15 @@ def output(bays):
                     if cont.id_output != -1:
                         # print(type(cont.stringContainer()))
                         content = cont.stringContainer()
-                        text += content+"\n"
+                        text += content + "\n"
     print(text)
 
-    f_out = open("out.txt", "wt")
+    f_out = open("out.txt", "w")
     f_out.write(str(text))
 
     f_out.close()
     print("done")
+
 
 def main():
     # danh sách các container và hành trình

@@ -167,7 +167,7 @@ def get_info_har(harbours, name_har):
 def output_route(path_out, s, e, route, harbours):
     # outTrans = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
 
-    har = get_info_har(harbours, s)
+    # har = get_info_har(harbours, s)
 
     f = open(path_out + 'route.txt', 'w', encoding="utf-8")
     for i in route:
@@ -178,16 +178,18 @@ def output_route(path_out, s, e, route, harbours):
     f.close()
 
 
-if __name__ == '__main__':
-    path = "D:/GitHub/DAAlgo/data.txt"
+def make_route_auto(source, dest):
+    path = "data.txt"
     # path = "D:/DAAlgo/data.txt"
-    path_out = "D:/GitHub/DAAlgo/"
+    path_out = "C:/Users/Mr.SpAm-PC/Documents/Git/DAAlgo/"
     # path_out = "D:/DAAlgo/"
 
     harbours = inputHarbours(path)
 
-    D = MinPath("A", "E", "10am", harbours)
+    D = MinPath(source, dest, "10am", harbours)
     D.find_min_path(harbours, path_out)
-    s, e, route = D.find_min_path( harbours, path_out)
-
+    s, e, route = D.find_min_path(harbours, path_out)
     output_route(path_out, s, e, route, harbours)
+
+# if __name__ == '__main__':
+#     make_route_auto("A", "E")
