@@ -4,7 +4,9 @@ import os
 import platform
 import sys
 import operator
+
 sys.setrecursionlimit(1000)
+
 
 class MinPath:
     def __init__(self, start, end, time, harbours):
@@ -36,16 +38,15 @@ class MinPath:
                 for h_adj in list_h_adj:
                     val[h_adj[0]] = h_adj[1]
             train_map[start] = val
-        # print(train_map)
+        print(train_map)
         return train_map
 
     # train_map{}: key = start
     # value = {} key =
 
-
     def try_node(self, current, n, visited, neighbor, route, dist, f):
         if self.start == self.end:
-            return -1 
+            return -1
         if route[current] == self.end:
 
             for i in range(0, n):
@@ -62,7 +63,7 @@ class MinPath:
                 if current + 1 == n - 1 and route[current + 1] == self.end:
 
                     neighbor[current + 1] = self.find_adj(route[current + 1])
-                    return self.try_node(current + 1 , n, visited, neighbor, route, dist, f)
+                    return self.try_node(current + 1, n, visited, neighbor, route, dist, f)
                 elif current + 1 == n - 1 and route[current + 1] != self.end:
                     visited.remove(route[current + 1])
                     dist.pop(current + 1)
@@ -72,7 +73,7 @@ class MinPath:
 
                 elif current + 1 < n:
                     neighbor[current + 1] = self.find_adj(route[current + 1])
-                    return self.try_node(current + 1 , n, visited, neighbor, route, dist, f)
+                    return self.try_node(current + 1, n, visited, neighbor, route, dist, f)
 
                 if current + 1 > len(visited):
                     visited.remove(route[current + 1])
@@ -80,8 +81,7 @@ class MinPath:
         if current > 0:
             visited.remove(route[current])
             dist.pop(current)
-            return self.try_node(current - 1 , n, visited, neighbor, route, dist, f)
-
+            return self.try_node(current - 1, n, visited, neighbor, route, dist, f)
 
     def find_min_path(self, harbours, path_out):
         train_map = self.make_train_map(harbours)
@@ -90,10 +90,10 @@ class MinPath:
         # danh dau trang thai
         visited = []
         # bang phuong an
-        route = ["NULL"]*(n+1)
+        route = ["NULL"] * (n + 1)
         route[0] = self.start
 
-        neighbor = ["NULL"]*(n)
+        neighbor = ["NULL"] * (n)
         visited.append(self.start)
         current_dist = 0
         current = 0
@@ -108,7 +108,7 @@ class MinPath:
         f = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
         self.try_node(current, n, visited, neighbor, route, dist, f)
         f.close()
-        
+
         out_file = open(path_out + 'outTrans.txt', 'r', encoding="utf-8")
         for line in out_file:
             result.append(line.strip("\n").split("\t"))
@@ -120,10 +120,11 @@ class MinPath:
                 temp = i
 
         file = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
-        
+
         if temp != -1:
             # print(result[temp])
-            file.write("Shortest path from " + self.start + " to " + self.end + ": " + str(result[temp][n]) + " km\n" + "Route: ")
+            file.write("Shortest path from " + self.start + " to " + self.end + ": " + str(
+                result[temp][n]) + " km\n" + "Route: ")
             for i in range(0, n):
                 file.write(result[temp][i])
                 if i != n - 1:
@@ -134,7 +135,7 @@ class MinPath:
         file.close()
 
         output = open(path_out + 'output.txt', 'w', encoding="utf-8")
-        
+
         if temp != -1:
             for i in range(0, n):
                 output.write(result[temp][i] + "\n")
@@ -143,6 +144,7 @@ class MinPath:
         if temp != -1:
             out_route = result[temp][:n]
         return self.start, self.end, (out_route)
+
 
 def inputHarbours(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -187,6 +189,7 @@ def make_route_auto(source, dest):
     D.find_min_path(harbours, path_out)
     s, e, route = D.find_min_path(harbours, path_out)
     output_route(path_out, s, e, route, harbours)
+
 
 if __name__ == '__main__':
     make_route_auto("A", "D")
