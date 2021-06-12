@@ -110,7 +110,6 @@ class MinPath:
         f.close()
         
         out_file = open(path_out + 'outTrans.txt', 'r', encoding="utf-8")
-
         for line in out_file:
             result.append(line.strip("\n").split("\t"))
         out_file.close()
@@ -143,7 +142,6 @@ class MinPath:
         out_route = []
         if temp != -1:
             out_route = result[temp][:n]
-
         return self.start, self.end, (out_route)
 
 def inputHarbours(path):
@@ -179,10 +177,10 @@ def output_route(path_out, s, e, route, harbours):
 
 
 def make_route_auto(source, dest):
-    # path = "data1.txt"
-    path = "D:/GitHub/DAAlgo/data1.txt"
-    # path_out = ""
-    path_out = "D:/DAAlgo/"
+    path = "D:\DAAlgo\data1.txt"
+    # path = "D:/GitHub/DAAlgo/data1.txt"
+    path_out = "D:\DAAlgo"
+    # path_out = "D:/DAAlgo/"
 
     harbours = inputHarbours(path)
     D = MinPath(source, dest, "10am", harbours)
@@ -191,4 +189,4 @@ def make_route_auto(source, dest):
     output_route(path_out, s, e, route, harbours)
 
 if __name__ == '__main__':
-    make_route_auto("A", "E")
+    make_route_auto("A", "D")
