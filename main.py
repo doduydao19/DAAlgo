@@ -66,12 +66,12 @@ def input_Harbours():
         for d in range(0, len(destinations)):
             dist = find_distance(destinations[d], har_name, data)
             harbours.append(hObj.inputHarbour(destinations[d], har_name, dist, False))
-        return harbours
+        return harbours, har_name
     else:
         return None
 
 def output_harbours(harbours):
-    fileName = "data1.txt"
+    fileName = "data_har_auto.txt"
     with open(fileName, "wt", encoding="utf-8") as f:
         for h in harbours:
             print(h.infoHarbour())
@@ -89,19 +89,25 @@ def output_containers(harbours):
                 f.write(h.infoContainer())
 
 def input_auto():
-    transport_windows.make_route_auto("A", "E")
+    source = input("Nhập cảng nguồn: ")
+    des = input("Nhập cảng đích: ")
+    transport_windows.make_route_auto(source, des, True)
 
 def output_auto():
-    sortContainer.sort_container()
+    sortContainer.sort_container(True)
 
 def main():
     print("Ấn 1 để nhập thủ công, ấn 2 để nhập từ file.")
     choose = int(input("Lựa chọn là: "))
 
     if choose == 1:
-        hs = input_Harbours()
+        hs, har_name = input_Harbours()
         output_harbours(hs)
         output_containers(hs)
+        print("Nhập cảng đích:")
+        des = input()
+        transport_windows.make_route_auto(har_name, des, False)
+        sortContainer.sort_container(False)
 
     if choose == 2:
         input_auto()

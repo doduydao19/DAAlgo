@@ -747,9 +747,18 @@ def input(f_data_harbour):
     return data
 
 
-def output(bays):
+def output(bays, f_name):
     text = ""
+    hs = []
+    with open(f_name, "r", encoding="utf-8") as f:
+        for l in f:
+            l = l[:-1]
+            h_name = l.split("\t")[0]
+            hs.append(h_name)
+    id = 0
+
     for tiers in bays:
+        text += "Các container của cảng " + hs[id] + "\n"
         for tier in tiers:
             for row in tier:
                 for cont in row:
@@ -758,22 +767,25 @@ def output(bays):
                         content = cont.stringContainer()
                         text += content + "\n"
         text += "\n"
+        id = id + 1
     print(text)
 
-
-    f_out = open("out.txt", "w")
+    f_out = open("outPos.txt", "w", encoding="utf-8")
     f_out.write(str(text))
 
     f_out.close()
     print("done")
 
 
-def sort_container():
-    # danh sách các container và hành trình
-    f_data_harbour = "data.txt"
+def sort_container(state):
+    if state == True:
+        f_data_harbour = "data_auto.txt"
+    else:
+        f_data_harbour = "data.txt"
     data = input(f_data_harbour)
     bays = create_position_all_bays(data)
-    output(bays)
+    output(bays, f_data_harbour)
+
     return
 
 if __name__ == '__main__':

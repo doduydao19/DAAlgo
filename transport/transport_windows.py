@@ -83,7 +83,7 @@ class MinPath:
             dist.pop(current)
             return self.try_node(current - 1, n, visited, neighbor, route, dist, f)
 
-    def find_min_path(self, harbours, path_out):
+    def find_min_path(self, harbours):
         train_map = self.make_train_map(harbours)
         node = list(train_map.keys())
         n = len(node)
@@ -105,11 +105,11 @@ class MinPath:
         min = float('inf')
         temp = -1
 
-        f = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
+        f = open('route_diss.txt', 'w', encoding="utf-8")
         self.try_node(current, n, visited, neighbor, route, dist, f)
         f.close()
 
-        out_file = open(path_out + 'outTrans.txt', 'r', encoding="utf-8")
+        out_file = open('route_diss.txt', 'r', encoding="utf-8")
         for line in out_file:
             result.append(line.strip("\n").split("\t"))
         out_file.close()
@@ -119,7 +119,7 @@ class MinPath:
                 min = float(result[i][n])
                 temp = i
 
-        file = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
+        file = open('route_diss.txt', 'w', encoding="utf-8")
 
         if temp != -1:
             # print(result[temp])
@@ -134,7 +134,7 @@ class MinPath:
             file.write("No route!")
         file.close()
 
-        output = open(path_out + 'output.txt', 'w', encoding="utf-8")
+        output = open('output.txt', 'w', encoding="utf-8")
 
         if temp != -1:
             for i in range(0, n):
@@ -164,12 +164,12 @@ def get_info_har(harbours, name_har):
             return h
 
 
-def output_route(path_out, s, e, route, harbours):
-    # outTrans = open(path_out + 'outTrans.txt', 'w', encoding="utf-8")
+def output_route( s, e, route, harbours):
+    # route_diss = open(path_out + 'route_diss.txt', 'w', encoding="utf-8")
 
     # har = get_info_har(harbours, s)
 
-    f = open(path_out + 'data.txt', 'w', encoding="utf-8")
+    f = open('data_auto.txt', 'w', encoding="utf-8")
     for i in route:
         har = get_info_har(harbours, i)
         print(i)
@@ -178,18 +178,17 @@ def output_route(path_out, s, e, route, harbours):
     f.close()
 
 
-def make_route_auto(source, dest):
-    path = "D:\DAAlgo\data1.txt"
-    # path = "D:/GitHub/DAAlgo/data1.txt"
-    path_out = "D:\DAAlgo"
-    # path_out = "D:/DAAlgo/"
+def make_route_auto(source, dest, state):
+    if state == True:
+        path = "data_har_auto.txt"
+    else:
+        path = "/data_har_auto.txt"
 
     harbours = inputHarbours(path)
     D = MinPath(source, dest, "10am", harbours)
-    D.find_min_path(harbours, path_out)
-    s, e, route = D.find_min_path(harbours, path_out)
-    output_route(path_out, s, e, route, harbours)
+    D.find_min_path(harbours)
+    s, e, route = D.find_min_path(harbours)
+    output_route( s, e, route, harbours)
 
-
-if __name__ == '__main__':
-    make_route_auto("A", "D")
+# if __name__ == '__main__':
+#     make_route_auto("A", "D")
