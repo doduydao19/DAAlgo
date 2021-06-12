@@ -58,9 +58,9 @@ def input_Harbours():
             print("Nhập cảng thứ", h + 1)
             dist = find_distance(har_name, destinations[h], data)
             harbours.append(hObj.inputHarbour(har_name, destinations[h], dist, True))
-            for d in range(h+1,len(destinations)):
-                dist = find_distance(destinations[h], destinations[d], data)
-                harbours.append(hObj.inputHarbour(destinations[h], destinations[d], dist, False))
+            # for d in range(len(all_harbour)):
+            #     dist = find_distance(all_harbour[d], destinations[h], data)
+            #     harbours.append(hObj.inputHarbour(all_harbour[d], destinations[h], dist, False))
         return harbours
     else:
         return None
