@@ -2,8 +2,6 @@ import pandas
 import networkx
 import numpy as np
 
-
-
 data_route = pandas.read_excel("/Users/lehuy/Downloads/Daa/routeData.xlsx", header = None)
 
 edgeList_route = data_route.values.tolist()

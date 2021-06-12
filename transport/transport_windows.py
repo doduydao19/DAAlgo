@@ -153,8 +153,8 @@ def inputHarbours(path):
             harbour = line.strip("\n").split("\t")
             harbours.append(harbour)
 
-    # for h in harbours:
-    #     print(h)
+    for h in harbours:
+        print(h)
     return harbours
 
 
@@ -179,17 +179,16 @@ def output_route(path_out, s, e, route, harbours):
 
 
 def make_route_auto(source, dest):
-    path = "data1.txt"
-    # path = "D:/DAAlgo/data1.txt"
-    path_out = ""
-    # path_out = "D:/DAAlgo/"
+    # path = "data1.txt"
+    path = "D:/GitHub/DAAlgo/data1.txt"
+    # path_out = ""
+    path_out = "D:/DAAlgo/"
 
     harbours = inputHarbours(path)
-
     D = MinPath(source, dest, "10am", harbours)
     D.find_min_path(harbours, path_out)
     s, e, route = D.find_min_path(harbours, path_out)
     output_route(path_out, s, e, route, harbours)
 
-# if __name__ == '__main__':
-#     make_route_auto("A", "E")
+if __name__ == '__main__':
+    make_route_auto("A", "E")

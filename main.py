@@ -10,7 +10,7 @@ def find_distance(source, dest, data):
                 return int(h[2])
 
 def input_Harbours():
-    file_name = "quanhegiuacaccang.txt"
+    file_name = "harbours_relation.txt"
     with open(file_name, "r", encoding="utf-8") as f:
         data = []
         harbour = []
@@ -78,9 +78,10 @@ def output_containers(harbours):
     if os.path.isdir(folderName) == False:
         os.mkdir(folderName)
     for h in harbours:
-        fileName = folderName + "/" + h.name
-        with open(fileName, "w", encoding="utf-8") as f:
-            f.write(h.infoContainer())
+        if h.no_container != 0:
+            fileName = folderName + "/" + h.dst
+            with open(fileName, "w", encoding="utf-8") as f:
+                f.write(h.infoContainer())
 
 def input_auto():
     transport_windows.make_route_auto("A", "E")
